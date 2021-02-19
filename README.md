@@ -160,7 +160,7 @@ $ cat /etc/hosts
 
 ### update software and linux kernel
 
-- execute on all nodes: update yum repositories `(Options)`
+- execute on all nodes: update yum repositories `(Optional)`
 
 ```bash
 # backup old yum.repos.d files
@@ -205,7 +205,7 @@ Linux k8s-master01 5.11.0-1.el7.elrepo.x86_64 #1 SMP Sun Feb 14 18:10:38 EST 202
 
 ### install required softwares and configurate linux
 
-- execute on all nodes: update yum repositories `(Options)`
+- execute on all nodes: update yum repositories `(Optional)`
 
 ```bash
 # backup old yum.repos.d files
