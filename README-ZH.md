@@ -14,25 +14,27 @@
 
 ## 目录
 
-- [部署架构](#部署架构)
-  - [部署架构概要](#部署架构概要)
-  - [主机清单](#主机清单)
-  - [版本信息](#版本信息)
-- [安装前准备](#安装前准备)
-  - [主机名设置](#主机名设置)
-  - [更新软件与系统内核](#更新软件与系统内核)
-  - [安装基础软件并配置系统](#安装基础软件并配置系统)
-  - [安装docker和kubernetes软件](#安装docker和kubernetes软件)
-  - [防火墙配置](#防火墙配置)
-  - [系统参数设置](#系统参数设置)
-  - [设置master节点互信](#设置master节点互信)
-  - [拉取相关镜像](#拉取相关镜像)
-- [安装kubernetes高可用集群](#安装kubernetes高可用集群)
-  - [初始化kubernetes集群](#初始化kubernetes集群)
-  - [创建高可用kubernetes集群](#创建高可用kubernetes集群)
-  - [安装metrics-server组件](#安装metrics-server组件)
-  - [安装kubernetes-dashboard组件](#安装kubernetes-dashboard组件)
-  - [检查高可用kubernetes集群状态](#检查高可用kubernetes集群状态)
+- [kubeadm-high-availiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer](#kubeadm-high-availiability-english--中文---基于kubeadm的kubernetes高可用集群部署包含-stacked-loadbalancer)
+  - [目录](#目录)
+  - [部署架构](#部署架构)
+    - [部署架构概要](#部署架构概要)
+    - [主机清单](#主机清单)
+    - [版本信息](#版本信息)
+  - [安装前准备](#安装前准备)
+    - [主机名设置](#主机名设置)
+    - [更新软件与系统内核](#更新软件与系统内核)
+    - [安装基础软件并配置系统](#安装基础软件并配置系统)
+    - [安装docker和kubernetes软件](#安装docker和kubernetes软件)
+    - [防火墙配置](#防火墙配置)
+    - [系统参数设置](#系统参数设置)
+    - [设置master节点互信](#设置master节点互信)
+    - [拉取相关镜像](#拉取相关镜像)
+  - [安装kubernetes高可用集群](#安装kubernetes高可用集群)
+    - [初始化kubernetes集群](#初始化kubernetes集群)
+    - [创建高可用kubernetes集群](#创建高可用kubernetes集群)
+    - [安装metrics-server组件](#安装metrics-server组件)
+    - [安装kubernetes-dashboard组件](#安装kubernetes-dashboard组件)
+    - [检查高可用kubernetes集群状态](#检查高可用kubernetes集群状态)
 
 ## 部署架构
 
@@ -272,65 +274,6 @@ $ systemctl restart docker
 
 # 检查docker安装情况
 $ docker info
-Client:
- Context:    default
- Debug Mode: false
- Plugins:
-  app: Docker App (Docker Inc., v0.9.1-beta3)
-  buildx: Build with BuildKit (Docker Inc., v0.5.1-docker)
-
-Server:
- Containers: 36
-  Running: 10
-  Paused: 0
-  Stopped: 26
- Images: 18
- Server Version: 20.10.3
- Storage Driver: overlay2
-  Backing Filesystem: xfs
-  Supports d_type: true
-  Native Overlay Diff: true
- Logging Driver: json-file
- Cgroup Driver: cgroupfs
- Cgroup Version: 1
- Plugins:
-  Volume: local
-  Network: bridge host ipvlan macvlan null overlay
-  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
- Swarm: inactive
- Runtimes: io.containerd.runc.v2 io.containerd.runtime.v1.linux runc
- Default Runtime: runc
- Init Binary: docker-init
- containerd version: 269548fa27e0089a8b8278fc4fc781d7f65a939b
- runc version: ff819c7e9184c13b7c2607fe6c30ae19403a7aff
- init version: de40ad0
- Security Options:
-  seccomp
-   Profile: default
- Kernel Version: 5.11.0-1.el7.elrepo.x86_64
- Operating System: CentOS Linux 7 (Core)
- OSType: linux
- Architecture: x86_64
- CPUs: 2
- Total Memory: 3.844GiB
- Name: k8s-master01
- ID: 5AX2:GDQX:GWDW:6Y6C:N7F4:FY65:XZ27:FK7M:JVM2:U2MK:KQ32:W42P
- Docker Root Dir: /var/lib/docker
- Debug Mode: false
- Registry: https://index.docker.io/v1/
- Labels:
- Experimental: false
- Insecure Registries:
-  127.0.0.0/8
- Registry Mirrors:
-  https://hub-mirror.c.163.com/
-  https://docker.mirrors.ustc.edu.cn/
-  http://f1361db2.m.daocloud.io/
-  https://registry.docker-cn.com/
- Live Restore Enabled: false
-
-WARNING: No blkio weight support
-WARNING: No blkio weight_device support
 
 # 安装kubernetes
 $ yum search kubeadm kubelet --showduplicates
