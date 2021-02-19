@@ -1,0 +1,10 @@
+version: '2'
+services:
+  keepalived:
+    image: {{ $.Values.imageRepository }}/public/nginx:1.19.4-alpine
+    container_name: nginx-lb
+    hostname: nginx-lb
+    volumes:
+    - ./nginx-lb.conf:/etc/nginx/nginx.conf
+    network_mode: host
+    restart: always
