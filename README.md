@@ -1,44 +1,44 @@
-# kubeadm-highavailiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer
+# kubeadm-high-availiability (English / 中文) - kubernetes high availiability deployment based on kubeadm, stacked loadbalancer included
 
 ![k8s logo](images/kubernetes.png)
 
-- 该指引适用于v1.15.x 以上版本的kubernetes集群
+- For kubernetes v1.15+
 
 - [English version](README.md)
-- [Chinese version](README-ZH.md)
+- [中文版本](README-ZH.md)
 
 ---
 
-- [GitHub项目地址](https://github.com/cookeem/kubeadm-ha/)
-- [OSChina项目地址](https://git.oschina.net/cookeem/kubeadm-ha/)
+- [GitHub project URL](https://github.com/cookeem/kubeadm-ha/)
+- [OSChina project URL](https://git.oschina.net/cookeem/kubeadm-ha/)
 
-## 目录
+## category
 
-- [kubeadm-highavailiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer](#kubeadm-highavailiability-english--中文---基于kubeadm的kubernetes高可用集群部署包含-stacked-loadbalancer)
-  - [目录](#目录)
-  - [部署架构](#部署架构)
-    - [部署架构概要](#部署架构概要)
-    - [主机清单](#主机清单)
-    - [版本信息](#版本信息)
-  - [安装前准备](#安装前准备)
-    - [主机名设置](#主机名设置)
-    - [更新软件与系统内核](#更新软件与系统内核)
-    - [安装基础软件并配置系统](#安装基础软件并配置系统)
-    - [安装docker和kubernetes软件](#安装docker和kubernetes软件)
-    - [防火墙配置](#防火墙配置)
-    - [系统参数设置](#系统参数设置)
-    - [设置master节点互信](#设置master节点互信)
-    - [拉取相关镜像](#拉取相关镜像)
-  - [安装kubernetes高可用集群](#安装kubernetes高可用集群)
-    - [初始化kubernetes集群](#初始化kubernetes集群)
-    - [创建高可用kubernetes集群](#创建高可用kubernetes集群)
-    - [安装metrics-server组件](#安装metrics-server组件)
-    - [安装kubernetes-dashboard组件](#安装kubernetes-dashboard组件)
-    - [检查高可用kubernetes集群状态](#检查高可用kubernetes集群状态)
+- [kubeadm-high-availiability (English / 中文) - kubernetes high availiability deployment based on kubeadm, stacked loadbalancer included](#kubeadm-high-availiability-english--中文---kubernetes-high-availiability-deployment-based-on-kubeadm-stacked-loadbalancer-included)
+  - [category](#category)
+  - [deployment architecture](#deployment-architecture)
+    - [deployment architecture summary](#deployment-architecture-summary)
+    - [hosts list](#hosts-list)
+    - [version info](#version-info)
+  - [prerequisites](#prerequisites)
+    - [hostname settings](#hostname-settings)
+    - [update software and linux kernel](#update-software-and-linux-kernel)
+    - [install required softwares and configurate linux](#install-required-softwares-and-configurate-linux)
+    - [install docker and kubernetes softwares](#install-docker-and-kubernetes-softwares)
+    - [firewalld configuration](#firewalld-configuration)
+    - [linux system configuration](#linux-system-configuration)
+    - [master nodes mutual trust](#master-nodes-mutual-trust)
+    - [pull relative docker images](#pull-relative-docker-images)
+  - [install kubernetes high-availiability cluster](#install-kubernetes-high-availiability-cluster)
+    - [initial kubernetes cluster](#initial-kubernetes-cluster)
+    - [bootstrap high-availiability kubernetes cluster](#bootstrap-high-availiability-kubernetes-cluster)
+    - [install metrics-server component](#install-metrics-server-component)
+    - [install kubernetes-dashboard component](#install-kubernetes-dashboard-component)
+    - [check kubernetes cluster status](#check-kubernetes-cluster-status)
 
-## 部署架构
+## deployment architecture
 
-### 部署架构概要
+### deployment architecture summary
 
 ![](images/kubeadm-ha.svg)
 
@@ -46,7 +46,7 @@
 - 需要为keepalived分配一个vip（虚拟浮动ip）作为kubernetes高可用集群的访问入口。
 - nginx-lb和keepalived以pod形式直接托管在kubernetes集群中，当出现故障的情况下可以实现自动恢复，提高集群可靠性。
 
-### 主机清单
+### hosts list
 
 主机名        | IP地址        | 说明            | 组件
 :---         | :---         | :---           | :---
@@ -55,7 +55,7 @@ k8s-master02 | 172.20.10.5  | master节点      | keepalived、nginx、kubelet�
 k8s-master03 | 172.20.10.6  | master节点      | keepalived、nginx、kubelet、kube-apiserver、kube-scheduler、kube-controller-manager、etcd
 k8s-vip      | 172.20.10.10 | keepalived vip | 无
 
-### 版本信息
+### version info
 
 - 系统和集群版本
 
@@ -119,9 +119,9 @@ calico                | v3.17.2  | 网络组件
 metrics-server        | v0.4.2   | 性能采集组件
 kubernetes-dashboard  | v2.2.0   | kubernetes管理控制面板
 
-## 安装前准备
+## prerequisites
 
-### 主机名设置
+### hostname settings
 
 - 请根据实际情况配置主机名和IP地址，请提前分配一个vip（浮动IP）给keepalived
 
@@ -130,19 +130,19 @@ kubernetes-dashboard  | v2.2.0   | kubernetes管理控制面板
 # 非常重要，请务必按照实际情况设置主机名
 #######################
 
-# 在k8s-master01节点上设置主机名
+# execute on k8s-master01: 设置主机名
 $ hostnamectl set-hostname k8s-master01
 
-# 在k8s-master02节点上设置主机名
+# execute on k8s-master02: 设置主机名
 $ hostnamectl set-hostname k8s-master02
 
-# 在k8s-master03节点上设置主机名
+# execute on k8s-master03: 设置主机名
 $ hostnamectl set-hostname k8s-master03
 
 #######################
 # 非常重要，请务必按照实际情况设置/etc/hosts文件
 #######################
-# 在所有节点上设置/etc/hosts主机名配置
+# execute on all nodes: 设置/etc/hosts主机名配置
 $ echo '172.20.10.4 k8s-master01' >> /etc/hosts
 $ echo '172.20.10.5 k8s-master02' >> /etc/hosts
 $ echo '172.20.10.6 k8s-master03' >> /etc/hosts
@@ -158,9 +158,9 @@ $ cat /etc/hosts
 172.20.10.10 k8s-vip
 ```
 
-### 更新软件与系统内核
+### update software and linux kernel
 
-- 在所有节点上更新yum源`（本步骤可选）`
+- execute on all nodes: 更新yum源`（本步骤可选）`
 
 ```bash
 # 备份旧的yum.repos.d
@@ -179,21 +179,21 @@ $ cd /etc/yum.repos.d/
 $ find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
 ```
 
-- 在所有节点上更新软件版本与操作系统内核
+- execute on all nodes: 更新软件版本与操作系统内核
 
 ```bash
-# 在所有节点上更新软件
+# execute on all nodes: 更新软件
 $ yum -y update
 
-# 在所有节点上设置elrepo的yum源
+# execute on all nodes: 设置elrepo的yum源
 $ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
 $ rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
 
-# 在所有节点上安装新内核
+# execute on all nodes: 安装新内核
 $ yum --disablerepo="*" --enablerepo="elrepo-kernel" list available
 $ yum --enablerepo=elrepo-kernel install -y kernel-ml
 
-# 在所有节点上设置启动选项并重启
+# execute on all nodes: 设置启动选项并重启
 $ grub2-mkconfig -o /boot/grub2/grub.cfg
 $ grub2-set-default 0
 $ reboot
@@ -203,9 +203,9 @@ $ uname -a
 Linux k8s-master01 5.11.0-1.el7.elrepo.x86_64 #1 SMP Sun Feb 14 18:10:38 EST 2021 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
-### 安装基础软件并配置系统
+### install required softwares and configurate linux
 
-- 在所有节点上更新yum源`（本步骤可选）`
+- execute on all nodes: 更新yum源`（本步骤可选）`
 
 ```bash
 # 备份旧的yum.repos.d
@@ -240,7 +240,7 @@ $ cd /etc/yum.repos.d/
 $ find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
 ```
 
-- 在所有节点上安装基础软件并配置系统
+- execute on all nodes: 安装基础软件并配置系统
 
 ```bash
 # 安装基础软件
@@ -258,9 +258,9 @@ $ ls -al /var/log/journal
 $ echo 'export HISTTIMEFORMAT="%Y-%m-%d %T "' >> ~/.bashrc && source ~/.bashrc
 ```
 
-### 安装docker和kubernetes软件
+### install docker and kubernetes softwares
 
-- 在所有节点上安装docker和kubernetes软件
+- execute on all nodes: 安装docker和kubernetes软件
 
 ```bash
 # 安装docker
@@ -340,14 +340,14 @@ $ yum install -y kubeadm-1.20.2-0.x86_64 kubelet-1.20.2-0.x86_64 kubectl-1.20.2-
 $ systemctl enable kubelet && systemctl start kubelet && systemctl status kubelet
 ```
 
-### 防火墙配置
+### firewalld configuration
 
 ```bash
 ########################
 # master节点防火墙设置
 ########################
 
-# 所有master节点开放相关防火墙端口
+# execute on all master nodes: 开放相关防火墙端口
 $ firewall-cmd --zone=public --add-port=6443/tcp --permanent
 $ firewall-cmd --zone=public --add-port=2379-2380/tcp --permanent
 $ firewall-cmd --zone=public --add-port=10250/tcp --permanent
@@ -355,7 +355,7 @@ $ firewall-cmd --zone=public --add-port=10251/tcp --permanent
 $ firewall-cmd --zone=public --add-port=10252/tcp --permanent
 $ firewall-cmd --zone=public --add-port=30000-32767/tcp --permanent
 
-# 所有master节点必须开启firewalld该设置，否则dns无法解释
+# execute on all master nodes: 必须开启firewalld该设置，否则dns无法解释
 $ firewall-cmd --add-masquerade --permanent
 $ firewall-cmd --reload
 $ firewall-cmd --list-all --zone=public
@@ -380,7 +380,7 @@ $ iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
 $ echo '5,15,25,35,45,55 * * * * /usr/sbin/iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited' >> /var/spool/cron/root && crontab -l
 ```
 
-### 系统参数设置
+### linux system configuration
 
 - 所有节点上进行系统参数设置
 
@@ -413,53 +413,53 @@ $ sed -i '/swap/d' /etc/fstab
 $ cat /etc/fstab
 ```
 
-### 设置master节点互信
+### master nodes mutual trust
 
 - master节点设置互信
 
 ```bash
-# 在所有master节点安装sshpass
+# execute on all master nodes: 安装sshpass
 $ yum install -y sshpass
 
-# 在所有master节点执行一次ssh，自动创建~/.ssh/known_hosts文件，保证sshpass能够正常运行
+# execute on all master nodes: 执行一次ssh，自动创建~/.ssh/known_hosts文件，保证sshpass能够正常运行
 $ ssh k8s-master01
 $ ssh k8s-master02
 $ ssh k8s-master03
 
-# 在k8s-master01上执行
+# execute on k8s-master01: 
 $ export SSHHOST=k8s-master02
 $ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 $ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 $ sshpass -p "<MASTER02 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
 $ sshpass -p "<MASTER02 PASSWORD>" ssh ${SSHHOST}
 
-# 在k8s-master02上执行
+# execute on k8s-master01: 
 $ export SSHHOST=k8s-master03
 $ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 $ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 $ sshpass -p "<MASTER03 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
 $ sshpass -p "<MASTER03 PASSWORD>" ssh ${SSHHOST}
 
-# 在k8s-master03上执行
+# execute on k8s-master01: 
 $ export SSHHOST=k8s-master01
 $ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 $ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 $ sshpass -p "<MASTER01 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
 $ sshpass -p "<MASTER01 PASSWORD>" ssh ${SSHHOST}
 
-# 在k8s-master01上执行，把互信文件复制到所有master节点
+# execute on k8s-master01: ，把互信文件复制到execute on all master nodes: 
 $ scp ~/.ssh/authorized_keys k8s-master01:/root/.ssh/
 $ scp ~/.ssh/authorized_keys k8s-master02:/root/.ssh/
 $ scp ~/.ssh/authorized_keys k8s-master03:/root/.ssh/
 
-# 在所有master节点上验证互信
+# execute on all master nodes: 上验证互信
 $ ssh k8s-master01 "hostname && pwd" && \
 ssh k8s-master02 "hostname && pwd" && \
 ssh k8s-master03 "hostname && pwd" && \
 pwd
 ```
 
-### 拉取相关镜像
+### pull relative docker images
 
 ```bash
 # 查看kubernetes v1.20.2版本所需的所有镜像
@@ -501,21 +501,21 @@ $ docker pull kubernetesui/dashboard:v2.2.0
 $ docker pull kubernetesui/metrics-scraper:v1.0.6
 ```
 
-## 安装kubernetes高可用集群
+## install kubernetes high-availiability cluster
 
-### 初始化kubernetes集群
+### initial kubernetes cluster
 
 ```bash
-# 在k8s-master01上拉取kubeadm-ha
+# execute on k8s-master01: 拉取kubeadm-ha
 $ git clone https://github.com/cookeem/kubeadm-ha.git
 
-# 在k8s-master01上安装helm
+# execute on k8s-master01: 安装helm
 $ tar zxvf helm-v2.17.0-linux-amd64.tar.gz
 $ mv linux-amd64/helm /usr/bin/
 $ rm -rf linux-amd64
 $ helm --help
 
-# 在k8s-master01上配置k8s-install-info.yaml文件
+# execute on k8s-master01: 配置k8s-install-info.yaml文件
 #######################
 # 非常重要，请务必按照实际情况设置k8s-install-info.yaml文件
 # 详细说明参见k8s-install-info.yaml文件的备注
@@ -523,16 +523,16 @@ $ helm --help
 $ cd kubeadm-ha
 $ vi k8s-install-info.yaml
 
-# 在k8s-master01上使用helm生成安装配置文件
+# execute on k8s-master01: 使用helm生成安装配置文件
 $ mkdir -p output
 $ helm template k8s-install --output-dir output -f k8s-install-info.yaml
 $ cd output/k8s-install/templates/
 
-# 在k8s-master01上自动启动所有master节点的keepalived和nginx-lb
+# execute on k8s-master01: 自动启动execute on all master nodes: 的keepalived和nginx-lb
 $ sed -i '1,2d' create-config.sh
 $ sh create-config.sh
 
-# 在所有master节点上检查nginx-lb和keepalived的状态
+# execute on all master nodes: 上检查nginx-lb和keepalived的状态
 $ docker ps
 CONTAINER ID   IMAGE                      COMMAND                  CREATED          STATUS          PORTS     NAMES
 5b315d2e16a8   nginx:1.19.7-alpine        "/docker-entrypoint.…"   19 seconds ago   Up 19 seconds             nginx-lb
@@ -558,7 +558,7 @@ Then you can join any number of worker nodes by running the following on each as
 kubeadm join 172.20.10.10:16443 --token x9ebjl.ar0xzaygl06ofol5 \
     --discovery-token-ca-cert-hash sha256:2f0d35eb797088593a5c6cdaf817c2936339da6c38f27cfe8c2781aa8638c262 
 
-# 所有master节点设置KUBECONFIG环境变量
+# execute on all master nodes: 设置KUBECONFIG环境变量
 $ cat <<EOF >> ~/.bashrc
 export KUBECONFIG=/etc/kubernetes/admin.conf
 EOF
@@ -597,7 +597,7 @@ kube-system       kube-scheduler-k8s-master01               1/1     Running   0 
 tigera-operator   tigera-operator-7c5d47c4b5-mh228          1/1     Running   0          39s
 ```
 
-### 创建高可用kubernetes集群
+### bootstrap high-availiability kubernetes cluster
 
 ```bash
 # k8s-master02和k8s-master03节点上，执行命令，加入到kubernetes集群的control-plane
@@ -642,7 +642,7 @@ k8s-master01   Ready    control-plane,master   6m56s   v1.20.2
 k8s-master02   Ready    control-plane,master   3m59s   v1.20.2
 k8s-master03   Ready    control-plane,master   90s     v1.20.2
 
-# 所有master节点上设置kubectl自动完成
+# execute on all master nodes: 上设置kubectl自动完成
 $ kubectl get pods
 $ yum install -y bash-completion && mkdir -p ~/.kube/
 $ kubectl completion bash > ~/.kube/completion.bash.inc
@@ -652,13 +652,13 @@ source '$HOME/.kube/completion.bash.inc'
 " >> $HOME/.bash_profile
 $ source $HOME/.bash_profile
 
-# 所有master节点需要退出登录，然后重新登录
+# execute on all master nodes: 需要退出登录，然后重新登录
 $ exit
 
-# 在k8s-master01节点上允许master部署pod
+# execute on k8s-master01: 允许master部署pod
 $ kubectl taint nodes --all node-role.kubernetes.io/master-
 
-# 在所有master节点上使用kubelet自动创建keepalived和nginx-lb的pod
+# execute on all master nodes: 上使用kubelet自动创建keepalived和nginx-lb的pod
 $ mv /etc/kubernetes/keepalived/ /etc/kubernetes/manifests/
 $ mv /etc/kubernetes/manifests/keepalived/keepalived.yaml /etc/kubernetes/manifests/
 $ mv /etc/kubernetes/nginx-lb/ /etc/kubernetes/manifests/
@@ -693,7 +693,7 @@ nginx-lb-k8s-master01                  1/1     Running   0          13s
 nginx-lb-k8s-master02                  1/1     Running   0          11s
 nginx-lb-k8s-master03                  1/1     Running   0          8s
 
-# 在所有master节点上检查master节点的keepalived和nginx-lb的pod已经自动创建后，再进行以下操作
+# execute on all master nodes: 上检查master节点的keepalived和nginx-lb的pod已经自动创建后，再进行以下操作
 $ systemctl stop kubelet
 $ docker rm -f keepalived nginx-lb
 $ systemctl restart kubelet
@@ -742,7 +742,7 @@ $ curl -k https://k8s-vip:16443
   "code": 403
 }
 
-# 在所有master节点上修改/etc/kubernetes/admin.conf
+# execute on all master nodes: 上修改/etc/kubernetes/admin.conf
 $ sed -i 's/:16443/:6443/g' /etc/kubernetes/admin.conf
 
 # 在所有worker节点上执行join
@@ -750,7 +750,7 @@ $ kubeadm join xxxx --token xxxx \
     --discovery-token-ca-cert-hash xxxx
 ```
 
-### 安装metrics-server组件
+### install metrics-server component
 
 ```bash
 # 安装metrics-server
@@ -794,7 +794,7 @@ kube-system       nginx-lb-k8s-master03                     1m           1Mi
 tigera-operator   tigera-operator-7c5d47c4b5-nmb8b          6m           22Mi            
 ```
 
-### 安装kubernetes-dashboard组件
+### install kubernetes-dashboard component
 
 ```bash
 # 安装kubernetes-dashboard
@@ -843,7 +843,7 @@ kubernetes-dashboard访问URL: https://k8s-vip:30000
 
 ![](images/kubernetes-dashboard-pods.png)
 
-### 检查高可用kubernetes集群状态
+### check kubernetes cluster status
 
 ```bash
 # 查看所有pods的状态信息

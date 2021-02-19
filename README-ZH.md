@@ -1,11 +1,11 @@
-# kubeadm-highavailiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer
+# kubeadm-high-availiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer
 
 ![k8s logo](images/kubernetes.png)
 
 - 该指引适用于v1.15.x 以上版本的kubernetes集群
 
 - [English version](README.md)
-- [Chinese version](README-ZH.md)
+- [中文版本](README-ZH.md)
 
 ---
 
@@ -14,27 +14,25 @@
 
 ## 目录
 
-- [kubeadm-highavailiability (English / 中文) - 基于kubeadm的kubernetes高可用集群部署，包含 stacked loadbalancer](#kubeadm-highavailiability-english--中文---基于kubeadm的kubernetes高可用集群部署包含-stacked-loadbalancer)
-  - [目录](#目录)
-  - [部署架构](#部署架构)
-    - [部署架构概要](#部署架构概要)
-    - [主机清单](#主机清单)
-    - [版本信息](#版本信息)
-  - [安装前准备](#安装前准备)
-    - [主机名设置](#主机名设置)
-    - [更新软件与系统内核](#更新软件与系统内核)
-    - [安装基础软件并配置系统](#安装基础软件并配置系统)
-    - [安装docker和kubernetes软件](#安装docker和kubernetes软件)
-    - [防火墙配置](#防火墙配置)
-    - [系统参数设置](#系统参数设置)
-    - [设置master节点互信](#设置master节点互信)
-    - [拉取相关镜像](#拉取相关镜像)
-  - [安装kubernetes高可用集群](#安装kubernetes高可用集群)
-    - [初始化kubernetes集群](#初始化kubernetes集群)
-    - [创建高可用kubernetes集群](#创建高可用kubernetes集群)
-    - [安装metrics-server组件](#安装metrics-server组件)
-    - [安装kubernetes-dashboard组件](#安装kubernetes-dashboard组件)
-    - [检查高可用kubernetes集群状态](#检查高可用kubernetes集群状态)
+- [部署架构](#部署架构)
+  - [部署架构概要](#部署架构概要)
+  - [主机清单](#主机清单)
+  - [版本信息](#版本信息)
+- [安装前准备](#安装前准备)
+  - [主机名设置](#主机名设置)
+  - [更新软件与系统内核](#更新软件与系统内核)
+  - [安装基础软件并配置系统](#安装基础软件并配置系统)
+  - [安装docker和kubernetes软件](#安装docker和kubernetes软件)
+  - [防火墙配置](#防火墙配置)
+  - [系统参数设置](#系统参数设置)
+  - [设置master节点互信](#设置master节点互信)
+  - [拉取相关镜像](#拉取相关镜像)
+- [安装kubernetes高可用集群](#安装kubernetes高可用集群)
+  - [初始化kubernetes集群](#初始化kubernetes集群)
+  - [创建高可用kubernetes集群](#创建高可用kubernetes集群)
+  - [安装metrics-server组件](#安装metrics-server组件)
+  - [安装kubernetes-dashboard组件](#安装kubernetes-dashboard组件)
+  - [检查高可用kubernetes集群状态](#检查高可用kubernetes集群状态)
 
 ## 部署架构
 
