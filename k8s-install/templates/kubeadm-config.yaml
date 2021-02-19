@@ -1,7 +1,9 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: {{ $.Values.kubernetesVersion }}
-imageRepository: {{ $.Values.imageRepository }}/k8s
+{{- if $.Values.imageRepository }}
+imageRepository: {{ $.Values.imageRepository }}
+{{- end }}
 apiServer:
   certSANs:
   - {{ $.Values.kubernetesInfo.kubernetesVname | quote }}

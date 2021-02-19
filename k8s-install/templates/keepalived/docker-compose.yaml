@@ -1,7 +1,7 @@
 version: '2'
 services:
   keepalived:
-    image: {{ $.Values.imageRepository }}/public/osixia/keepalived:2.0.20
+    image: osixia/keepalived:2.0.20
     container_name: keepalived
     hostname: keepalived
     volumes:

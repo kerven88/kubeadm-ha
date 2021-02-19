@@ -1,7 +1,7 @@
 version: '2'
 services:
   keepalived:
-    image: {{ $.Values.imageRepository }}/public/nginx:1.19.4-alpine
+    image: nginx:1.19.7-alpine
     container_name: nginx-lb
     hostname: nginx-lb
     volumes:

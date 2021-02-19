@@ -11,7 +11,7 @@ mkdir -p config/{{ $host.hostName }}/{keepalived,nginx-lb}
 cp keepalived/* config/{{ $host.hostName }}/keepalived/
 cp nginx-lb/* config/{{ $host.hostName }}/nginx-lb/
 {{- end }}
-cp calico-v3.16.5/*.yaml config/
+cp calico-v3.17.2/*.yaml config/
 cp kubeadm-config.yaml config/
 
 # create keepalived.conf files

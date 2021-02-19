@@ -4,23 +4,24 @@
 err=0
 for k in $(seq 1 12)
 do
-    check_code=$(curl -k https://localhost:6443)
-    if [[ $check_code == "" ]]; then
+    nc -zv localhost 6443
+    check_code=$?
+    if [[ $check_code == "0" ]]; then
+        err=0
+        break
+    else
         err=$(expr $err + 1)
         sleep 5
         continue
-    else
-        err=0
-        break
     fi
 done
 
 if [[ $err != "0" ]]; then
     # if apiserver is down send SIG=1
-    echo 'apiserver error!'
+    echo '[ERROR] apiserver error'
     exit 1
 else
     # if apiserver is up send SIG=0
-    echo 'apiserver normal!'
+    echo '[INFO] apiserver ok'
     exit 0
 fi
