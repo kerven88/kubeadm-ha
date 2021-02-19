@@ -57,21 +57,23 @@ k8s-vip      | 172.20.10.10 | keepalived vip | 无
 
 ### 版本信息
 
+- 系统和集群版本
+
 ```bash
 # Linux发行版信息
-cat /etc/redhat-release
+$ cat /etc/redhat-release
 CentOS Linux release 7.9.2009 (Core)
 
 # Linux内核版本
-uname -a
+$ uname -a
 Linux k8s-master01 5.11.0-1.el7.elrepo.x86_64 #1 SMP Sun Feb 14 18:10:38 EST 2021 x86_64 x86_64 x86_64 GNU/Linux
 
 # kubernetes版本
-kubelet --version
+$ kubelet --version
 Kubernetes v1.20.2
 
 # docker-ce版本信息
-docker version
+$ docker version
 Client: Docker Engine - Community
  Version:           20.10.3
  API version:       1.41
@@ -102,7 +104,7 @@ Server: Docker Engine - Community
   GitCommit:        de40ad0
 
 # docker-compose版本
-docker-compose version
+$ docker-compose version
 docker-compose version 1.18.0, build 8dd22a9
 docker-py version: 2.6.1
 CPython version: 3.6.8
@@ -129,25 +131,25 @@ kubernetes-dashboard  | v2.2.0   | kubernetes管理控制面板
 #######################
 
 # 在k8s-master01节点上设置主机名
-hostnamectl set-hostname k8s-master01
+$ hostnamectl set-hostname k8s-master01
 
 # 在k8s-master02节点上设置主机名
-hostnamectl set-hostname k8s-master02
+$ hostnamectl set-hostname k8s-master02
 
 # 在k8s-master03节点上设置主机名
-hostnamectl set-hostname k8s-master03
+$ hostnamectl set-hostname k8s-master03
 
 #######################
 # 非常重要，请务必按照实际情况设置/etc/hosts文件
 #######################
 # 在所有节点上设置/etc/hosts主机名配置
-echo '172.20.10.4 k8s-master01' >> /etc/hosts
-echo '172.20.10.5 k8s-master02' >> /etc/hosts
-echo '172.20.10.6 k8s-master03' >> /etc/hosts
-echo '172.20.10.10 k8s-vip' >> /etc/hosts
+$ echo '172.20.10.4 k8s-master01' >> /etc/hosts
+$ echo '172.20.10.5 k8s-master02' >> /etc/hosts
+$ echo '172.20.10.6 k8s-master03' >> /etc/hosts
+$ echo '172.20.10.10 k8s-vip' >> /etc/hosts
 
 # 查看/etc/hosts设置
-cat /etc/hosts
+$ cat /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 172.20.10.4 k8s-master01
@@ -162,42 +164,42 @@ cat /etc/hosts
 
 ```bash
 # 备份旧的yum.repos.d
-mkdir -p /etc/yum.repos.d/bak
-cd /etc/yum.repos.d
-mv * bak
+$ mkdir -p /etc/yum.repos.d/bak
+$ cd /etc/yum.repos.d
+$ mv * bak
 
 # 设置阿里云 centos yum源
-curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+$ curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 
 # 设置阿里云 epel yum源
-curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+$ curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 
 # 设置禁用gpgcheck
-cd /etc/yum.repos.d/
-find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
+$ cd /etc/yum.repos.d/
+$ find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
 ```
 
 - 在所有节点上更新软件版本与操作系统内核
 
 ```bash
-# 所有节点更新软件
-yum -y update
+# 在所有节点上更新软件
+$ yum -y update
 
-# 所有节点设置elrepo的yum源
-rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+# 在所有节点上设置elrepo的yum源
+$ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+$ rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
 
-# 安装新内核
-yum --disablerepo="*" --enablerepo="elrepo-kernel" list available
-yum --enablerepo=elrepo-kernel install -y kernel-ml
+# 在所有节点上安装新内核
+$ yum --disablerepo="*" --enablerepo="elrepo-kernel" list available
+$ yum --enablerepo=elrepo-kernel install -y kernel-ml
 
-# 所有节点设置启动选项并重启
-grub2-mkconfig -o /boot/grub2/grub.cfg
-grub2-set-default 0
-reboot
+# 在所有节点上设置启动选项并重启
+$ grub2-mkconfig -o /boot/grub2/grub.cfg
+$ grub2-set-default 0
+$ reboot
 
 # 确认内核版本
-uname -a
+$ uname -a
 Linux k8s-master01 5.11.0-1.el7.elrepo.x86_64 #1 SMP Sun Feb 14 18:10:38 EST 2021 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
@@ -207,23 +209,23 @@ Linux k8s-master01 5.11.0-1.el7.elrepo.x86_64 #1 SMP Sun Feb 14 18:10:38 EST 202
 
 ```bash
 # 备份旧的yum.repos.d
-mkdir -p /etc/yum.repos.d/bak
-cd /etc/yum.repos.d
-mv CentOS-* bak
+$ mkdir -p /etc/yum.repos.d/bak
+$ cd /etc/yum.repos.d
+$ mv CentOS-* bak
 
 # 设置阿里云 centos yum源
-curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+$ curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 
 # 设置阿里云 epel yum源
-curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+$ curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 
 # 设置阿里云 docker yum源
-yum install -y yum-utils device-mapper-persistent-data lvm2
-yum-config-manager -y --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
+$ yum install -y yum-utils device-mapper-persistent-data lvm2
+$ yum-config-manager -y --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+$ sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
 
 # 设置阿里云 kubernetes yum源
-cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+$ cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -234,54 +236,44 @@ gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors
 EOF
 
 # 设置禁用gpgcheck
-cd /etc/yum.repos.d/
-find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
+$ cd /etc/yum.repos.d/
+$ find . -name "*.repo" -exec sed -i 's/gpgcheck=1/gpgcheck=0/g' {} \;
 ```
 
 - 在所有节点上安装基础软件并配置系统
 
 ```bash
 # 安装基础软件
-yum install -y htop tree wget jq git net-tools ntpdate nc
+$ yum install -y htop tree wget jq git net-tools ntpdate nc
 
 # 更新时区
-timedatectl set-timezone Asia/Shanghai && date && echo 'Asia/Shanghai' > /etc/timezone
+$ timedatectl set-timezone Asia/Shanghai && date && echo 'Asia/Shanghai' > /etc/timezone
 
-# 所有节点上设置对journal进行持久化
-sed -i 's/#Storage=auto/Storage=auto/g' /etc/systemd/journald.conf && mkdir -p /var/log/journal && systemd-tmpfiles --create --prefix /var/log/journal
-systemctl restart systemd-journald.service
-ls -al /var/log/journal
+# 设置对journal进行持久化
+$ sed -i 's/#Storage=auto/Storage=auto/g' /etc/systemd/journald.conf && mkdir -p /var/log/journal && systemd-tmpfiles --create --prefix /var/log/journal
+$ systemctl restart systemd-journald.service
+$ ls -al /var/log/journal
 
-# 所有节点上设置history显示时间戳
-echo 'export HISTTIMEFORMAT="%Y-%m-%d %T "' >> ~/.bashrc && source ~/.bashrc
+# 设置history显示时间戳
+$ echo 'export HISTTIMEFORMAT="%Y-%m-%d %T "' >> ~/.bashrc && source ~/.bashrc
 ```
 
 ### 安装docker和kubernetes软件
 
+- 在所有节点上安装docker和kubernetes软件
+
 ```bash
 # 安装docker
-yum search docker-ce --showduplicates
-yum search docker-compose --showduplicates
-yum install docker-ce-20.10.3-3.el7.x86_64 docker-compose-1.18.0-4.el7.noarch 
-systemctl enable docker && systemctl start docker && systemctl status docker
-
-# 设置docker镜像源
-cat << EOF > /etc/docker/daemon.json
-{
-    "registry-mirrors": [
-        "https://hub-mirror.c.163.com",
-        "https://docker.mirrors.ustc.edu.cn",
-        "http://f1361db2.m.daocloud.io",
-        "https://registry.docker-cn.com"
-    ]
-}
-EOF
+$ yum search docker-ce --showduplicates
+$ yum search docker-compose --showduplicates
+$ yum install docker-ce-20.10.3-3.el7.x86_64 docker-compose-1.18.0-4.el7.noarch 
+$ systemctl enable docker && systemctl start docker && systemctl status docker
 
 # 重启docker
-systemctl restart docker
+$ systemctl restart docker
 
 # 检查docker安装情况
-docker info
+$ docker info
 Client:
  Context:    default
  Debug Mode: false
@@ -342,112 +334,126 @@ Server:
 WARNING: No blkio weight support
 WARNING: No blkio weight_device support
 
-# 在所有节点安装kubernetes
-yum search kubeadm kubelet --showduplicates
-yum install -y kubeadm-1.20.2-0.x86_64 kubelet-1.20.2-0.x86_64 kubectl-1.20.2-0.x86_64
-systemctl enable kubelet && systemctl start kubelet && systemctl status kubelet
+# 安装kubernetes
+$ yum search kubeadm kubelet --showduplicates
+$ yum install -y kubeadm-1.20.2-0.x86_64 kubelet-1.20.2-0.x86_64 kubectl-1.20.2-0.x86_64
+$ systemctl enable kubelet && systemctl start kubelet && systemctl status kubelet
 ```
 
 ### 防火墙配置
 
 ```bash
+########################
+# master节点防火墙设置
+########################
+
 # 所有master节点开放相关防火墙端口
-firewall-cmd --zone=public --add-port=6443/tcp --permanent
-firewall-cmd --zone=public --add-port=2379-2380/tcp --permanent
-firewall-cmd --zone=public --add-port=10250/tcp --permanent
-firewall-cmd --zone=public --add-port=10251/tcp --permanent
-firewall-cmd --zone=public --add-port=10252/tcp --permanent
-firewall-cmd --zone=public --add-port=30000-32767/tcp --permanent
-# 必须开启firewalld该设置，否则dns无法解释
-firewall-cmd --add-masquerade --permanent
-firewall-cmd --reload
-firewall-cmd --list-all --zone=public
+$ firewall-cmd --zone=public --add-port=6443/tcp --permanent
+$ firewall-cmd --zone=public --add-port=2379-2380/tcp --permanent
+$ firewall-cmd --zone=public --add-port=10250/tcp --permanent
+$ firewall-cmd --zone=public --add-port=10251/tcp --permanent
+$ firewall-cmd --zone=public --add-port=10252/tcp --permanent
+$ firewall-cmd --zone=public --add-port=30000-32767/tcp --permanent
+
+# 所有master节点必须开启firewalld该设置，否则dns无法解释
+$ firewall-cmd --add-masquerade --permanent
+$ firewall-cmd --reload
+$ firewall-cmd --list-all --zone=public
+
+########################
+# worker节点防火墙设置
+########################
 
 # 所有worker节点开放相关防火墙端口
-firewall-cmd --zone=public --add-port=10250/tcp --permanent
-firewall-cmd --zone=public --add-port=30000-32767/tcp --permanent
-# 必须开启firewalld该设置，否则dns无法解释
-firewall-cmd --add-masquerade --permanent
-firewall-cmd --reload
-firewall-cmd --list-all --zone=public
+$ firewall-cmd --zone=public --add-port=10250/tcp --permanent
+$ firewall-cmd --zone=public --add-port=30000-32767/tcp --permanent
+
+# 所有worker节点必须开启firewalld该设置，否则dns无法解释
+$ firewall-cmd --add-masquerade --permanent
+$ firewall-cmd --reload
+$ firewall-cmd --list-all --zone=public
 
 # 所有节点清除iptables规则，解决firewalld引起nodeport无法访问问题
-iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
+$ iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
 
 # 所有节点设置root的crontab，每十分钟设置一次
-echo '5,15,25,35,45,55 * * * * /usr/sbin/iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited' >> /var/spool/cron/root && crontab -l
+$ echo '5,15,25,35,45,55 * * * * /usr/sbin/iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited' >> /var/spool/cron/root && crontab -l
 ```
 
 ### 系统参数设置
 
-```bash
-# 在所有节点上设置selinux
-sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
-setenforce 0
-getenforce
+- 所有节点上进行系统参数设置
 
-# 在所有节点上设置sysctl
-cat <<EOF >  /etc/sysctl.d/k8s.conf
+```bash
+# 设置selinux
+$ sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+$ setenforce 0
+$ getenforce
+
+# 设置sysctl
+$ cat <<EOF >  /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 EOF
 
-# 在所有节点设置启用sysctl
-sysctl --system
+# 设置启用sysctl
+$ sysctl --system
 
-# 在所有节点加载br_netfilter模块
-modprobe br_netfilter
+# 加载br_netfilter模块
+$ modprobe br_netfilter
 
 # 禁用swap
-cat /proc/swaps
-swapoff -a
-cat /proc/swaps
+$ cat /proc/swaps
+$ swapoff -a
+$ cat /proc/swaps
 
 # 删除/etc/fstab中的swap分区设置
-sed -i '/swap/d' /etc/fstab
-cat /etc/fstab
+$ sed -i '/swap/d' /etc/fstab
+$ cat /etc/fstab
 ```
 
 ### 设置master节点互信
 
+- master节点设置互信
+
 ```bash
 # 在所有master节点安装sshpass
-yum install -y sshpass
+$ yum install -y sshpass
 
 # 在所有master节点执行一次ssh，自动创建~/.ssh/known_hosts文件，保证sshpass能够正常运行
-ssh k8s-master01
-ssh k8s-master02
-ssh k8s-master03
+$ ssh k8s-master01
+$ ssh k8s-master02
+$ ssh k8s-master03
 
 # 在k8s-master01上执行
-export SSHHOST=k8s-master02
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-sshpass -p "<YOUR PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
-sshpass -p "<YOUR PASSWORD>" ssh ${SSHHOST}
+$ export SSHHOST=k8s-master02
+$ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+$ sshpass -p "<MASTER02 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
+$ sshpass -p "<MASTER02 PASSWORD>" ssh ${SSHHOST}
 
 # 在k8s-master02上执行
-export SSHHOST=k8s-master03
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-sshpass -p "<YOUR PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
-sshpass -p "<YOUR PASSWORD>" ssh ${SSHHOST}
+$ export SSHHOST=k8s-master03
+$ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+$ sshpass -p "<MASTER03 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
+$ sshpass -p "<MASTER03 PASSWORD>" ssh ${SSHHOST}
 
 # 在k8s-master03上执行
-export SSHHOST=k8s-master01
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-sshpass -p "<YOUR PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
-sshpass -p "<YOUR PASSWORD>" ssh ${SSHHOST}
+$ export SSHHOST=k8s-master01
+$ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+$ sshpass -p "<MASTER01 PASSWORD>" scp ~/.ssh/authorized_keys root@${SSHHOST}:~/.ssh/
+$ sshpass -p "<MASTER01 PASSWORD>" ssh ${SSHHOST}
 
 # 在k8s-master01上执行，把互信文件复制到所有master节点
-scp ~/.ssh/authorized_keys k8s-master01:/root/.ssh/
-scp ~/.ssh/authorized_keys k8s-master02:/root/.ssh/
-scp ~/.ssh/authorized_keys k8s-master03:/root/.ssh/
+$ scp ~/.ssh/authorized_keys k8s-master01:/root/.ssh/
+$ scp ~/.ssh/authorized_keys k8s-master02:/root/.ssh/
+$ scp ~/.ssh/authorized_keys k8s-master03:/root/.ssh/
 
 # 在所有master节点上验证互信
-ssh k8s-master01 "hostname && pwd" && \
+$ ssh k8s-master01 "hostname && pwd" && \
 ssh k8s-master02 "hostname && pwd" && \
 ssh k8s-master03 "hostname && pwd" && \
 pwd
@@ -457,7 +463,7 @@ pwd
 
 ```bash
 # 查看kubernetes v1.20.2版本所需的所有镜像
-kubeadm config images list --kubernetes-version=v1.20.2
+$ kubeadm config images list --kubernetes-version=v1.20.2
 k8s.gcr.io/kube-apiserver:v1.20.2
 k8s.gcr.io/kube-controller-manager:v1.20.2
 k8s.gcr.io/kube-scheduler:v1.20.2
@@ -467,32 +473,32 @@ k8s.gcr.io/etcd:3.4.13-0
 k8s.gcr.io/coredns:1.7.0
 
 # 拉取kubernetes相关镜像
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.20.2
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.20.2
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.20.2
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.20.2
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.2
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.4.13-0
-docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.7.0
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-apiserver:v1.20.2
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-controller-manager:v1.20.2
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-scheduler:v1.20.2
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy:v1.20.2
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.2
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.4.13-0
+$ docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/coredns:1.7.0
 
 # 拉取calico相关镜像
-docker pull quay.io/tigera/operator:v1.13.5
-docker pull calico/cni:v3.17.2
-docker pull calico/kube-controllers:v3.17.2
-docker pull calico/node:v3.17.2
-docker pull calico/pod2daemon-flexvol:v3.17.2
-docker pull calico/typha:v3.17.2
+$ docker pull quay.io/tigera/operator:v1.13.5
+$ docker pull calico/cni:v3.17.2
+$ docker pull calico/kube-controllers:v3.17.2
+$ docker pull calico/node:v3.17.2
+$ docker pull calico/pod2daemon-flexvol:v3.17.2
+$ docker pull calico/typha:v3.17.2
 
 # nginx-lb keepalived相关镜像
-docker pull osixia/keepalived:2.0.20
-docker pull nginx:1.19.7-alpine
+$ docker pull osixia/keepalived:2.0.20
+$ docker pull nginx:1.19.7-alpine
 
 # metrics-server相关镜像
-docker pull k8s.gcr.io/metrics-server/metrics-server:v0.4.2
+$ docker pull k8s.gcr.io/metrics-server/metrics-server:v0.4.2
 
 # kubernetes-dashboard相关镜像
-docker pull kubernetesui/dashboard:v2.2.0
-docker pull kubernetesui/metrics-scraper:v1.0.6
+$ docker pull kubernetesui/dashboard:v2.2.0
+$ docker pull kubernetesui/metrics-scraper:v1.0.6
 ```
 
 ## 安装kubernetes高可用集群
@@ -501,39 +507,39 @@ docker pull kubernetesui/metrics-scraper:v1.0.6
 
 ```bash
 # 在k8s-master01上拉取kubeadm-ha
-git clone https://github.com/cookeem/kubeadm-ha.git
+$ git clone https://github.com/cookeem/kubeadm-ha.git
 
 # 在k8s-master01上安装helm
-tar zxvf helm-v2.17.0-linux-amd64.tar.gz
-mv linux-amd64/helm /usr/bin/
-rm -rf linux-amd64
-helm --help
+$ tar zxvf helm-v2.17.0-linux-amd64.tar.gz
+$ mv linux-amd64/helm /usr/bin/
+$ rm -rf linux-amd64
+$ helm --help
 
 # 在k8s-master01上配置k8s-install-info.yaml文件
 #######################
 # 非常重要，请务必按照实际情况设置k8s-install-info.yaml文件
 # 详细说明参见k8s-install-info.yaml文件的备注
 #######################
-cd kubeadm-ha
-vi k8s-install-info.yaml
+$ cd kubeadm-ha
+$ vi k8s-install-info.yaml
 
 # 在k8s-master01上使用helm生成安装配置文件
-mkdir -p output
-helm template k8s-install --output-dir output -f k8s-install-info.yaml
-cd output/k8s-install/templates/
+$ mkdir -p output
+$ helm template k8s-install --output-dir output -f k8s-install-info.yaml
+$ cd output/k8s-install/templates/
 
 # 在k8s-master01上自动启动所有master节点的keepalived和nginx-lb
-sed -i '1,2d' create-config.sh
-sh create-config.sh
+$ sed -i '1,2d' create-config.sh
+$ sh create-config.sh
 
 # 在所有master节点上检查nginx-lb和keepalived的状态
-docker ps
+$ docker ps
 CONTAINER ID   IMAGE                      COMMAND                  CREATED          STATUS          PORTS     NAMES
 5b315d2e16a8   nginx:1.19.7-alpine        "/docker-entrypoint.…"   19 seconds ago   Up 19 seconds             nginx-lb
 8207dff83965   osixia/keepalived:2.0.20   "/container/tool/run…"   23 seconds ago   Up 22 seconds             keepalived
 
 # k8s-master01上初始化集群
-kubeadm init --config=kubeadm-config.yaml --upload-certs
+$ kubeadm init --config=kubeadm-config.yaml --upload-certs
 
 # 执行后输出如下内容:
 # 记录以下内容，用于master节点和worker节点加入集群
@@ -553,14 +559,14 @@ kubeadm join 172.20.10.10:16443 --token x9ebjl.ar0xzaygl06ofol5 \
     --discovery-token-ca-cert-hash sha256:2f0d35eb797088593a5c6cdaf817c2936339da6c38f27cfe8c2781aa8638c262 
 
 # 所有master节点设置KUBECONFIG环境变量
-cat <<EOF >> ~/.bashrc
+$ cat <<EOF >> ~/.bashrc
 export KUBECONFIG=/etc/kubernetes/admin.conf
 EOF
-source ~/.bashrc
+$ source ~/.bashrc
 
 # 等待除coredns外所有pod Running
 # 未安装网络组件coredns会处于ContainerCreating状态
-kubectl get pods -A
+$ kubectl get pods -A
 NAMESPACE     NAME                                   READY   STATUS              RESTARTS   AGE
 kube-system   coredns-54d67798b7-b4g55               0/1     ContainerCreating   0          93s
 kube-system   coredns-54d67798b7-sflfm               0/1     ContainerCreating   0          93s
@@ -571,12 +577,12 @@ kube-system   kube-proxy-n8g5l                       1/1     Running            
 kube-system   kube-scheduler-k8s-master01            1/1     Running             0          89s
 
 # k8s-master01上安装calico网络
-kubectl apply -f calico-v3.17.2/tigera-operator.yaml
-sleep 1
-kubectl apply -f calico-v3.17.2/custom-resources.yaml
+$ kubectl apply -f calico-v3.17.2/tigera-operator.yaml
+$ sleep 1
+$ kubectl apply -f calico-v3.17.2/custom-resources.yaml
 
 # 安装calico网络组件后，所有pods处于Running
-kubectl get pods -A
+$ kubectl get pods -A
 NAMESPACE         NAME                                      READY   STATUS    RESTARTS   AGE
 calico-system     calico-kube-controllers-56689cf96-j2j6x   1/1     Running   0          28s
 calico-system     calico-node-dhzlb                         1/1     Running   0          28s
@@ -596,12 +602,12 @@ tigera-operator   tigera-operator-7c5d47c4b5-mh228          1/1     Running   0 
 ```bash
 # k8s-master02和k8s-master03节点上，执行命令，加入到kubernetes集群的control-plane
 # 一个一个master节点执行，等待所有pods处于Running状态后再执行下一个节点
-  kubeadm join xxxx --token xxxx \
-    --discovery-token-ca-cert-hash xxxx \
-    --control-plane --certificate-key xxxx
+$ kubeadm join xxxx --token xxxx \
+  --discovery-token-ca-cert-hash xxxx \
+  --control-plane --certificate-key xxxx
 
 # 等待所有节点的pods正常
-kubectl get pods -A
+$ kubectl get pods -A
 NAMESPACE         NAME                                      READY   STATUS    RESTARTS   AGE
 calico-system     calico-kube-controllers-56689cf96-7kg7m   1/1     Running   0          5m15s
 calico-system     calico-node-7rmx5                         1/1     Running   0          100s
@@ -630,36 +636,36 @@ kube-system       kube-scheduler-k8s-master03               1/1     Running   0 
 tigera-operator   tigera-operator-7c5d47c4b5-nmb8b          1/1     Running   1          5m24s
 
 # 等待所有nodes正常
-kubectl get nodes
+$ kubectl get nodes
 NAME           STATUS   ROLES                  AGE     VERSION
 k8s-master01   Ready    control-plane,master   6m56s   v1.20.2
 k8s-master02   Ready    control-plane,master   3m59s   v1.20.2
 k8s-master03   Ready    control-plane,master   90s     v1.20.2
 
 # 所有master节点上设置kubectl自动完成
-kubectl get pods
-yum install -y bash-completion && mkdir -p ~/.kube/
-kubectl completion bash > ~/.kube/completion.bash.inc
-printf "
+$ kubectl get pods
+$ yum install -y bash-completion && mkdir -p ~/.kube/
+$ kubectl completion bash > ~/.kube/completion.bash.inc
+$ printf "
 # Kubectl shell completion
 source '$HOME/.kube/completion.bash.inc'
 " >> $HOME/.bash_profile
-source $HOME/.bash_profile
+$ source $HOME/.bash_profile
 
 # 所有master节点需要退出登录，然后重新登录
-exit
+$ exit
 
 # 在k8s-master01节点上允许master部署pod
-kubectl taint nodes --all node-role.kubernetes.io/master-
+$ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 # 在所有master节点上使用kubelet自动创建keepalived和nginx-lb的pod
-mv /etc/kubernetes/keepalived/ /etc/kubernetes/manifests/
-mv /etc/kubernetes/manifests/keepalived/keepalived.yaml /etc/kubernetes/manifests/
-mv /etc/kubernetes/nginx-lb/ /etc/kubernetes/manifests/
-mv /etc/kubernetes/manifests/nginx-lb/nginx-lb.yaml /etc/kubernetes/manifests/
+$ mv /etc/kubernetes/keepalived/ /etc/kubernetes/manifests/
+$ mv /etc/kubernetes/manifests/keepalived/keepalived.yaml /etc/kubernetes/manifests/
+$ mv /etc/kubernetes/nginx-lb/ /etc/kubernetes/manifests/
+$ mv /etc/kubernetes/manifests/nginx-lb/nginx-lb.yaml /etc/kubernetes/manifests/
 
 # 查看/etc/kubernetes/manifests/下的配置文件
-tree /etc/kubernetes/manifests/
+$ tree /etc/kubernetes/manifests/
 /etc/kubernetes/manifests/
 ├── etcd.yaml
 ├── keepalived
@@ -678,7 +684,7 @@ tree /etc/kubernetes/manifests/
 #######################
 # 非常重要，请务必等待nginx-lb-k8s-masterX和keepalived-k8s-masterX的pod都处于Running状态
 #######################
-kubectl get pods -n kube-system
+$ kubectl get pods -n kube-system
 NAME                                   READY   STATUS    RESTARTS   AGE
 keepalived-k8s-master01                1/1     Running   0          13s
 keepalived-k8s-master02                1/1     Running   0          11s
@@ -688,12 +694,12 @@ nginx-lb-k8s-master02                  1/1     Running   0          11s
 nginx-lb-k8s-master03                  1/1     Running   0          8s
 
 # 在所有master节点上检查master节点的keepalived和nginx-lb的pod已经自动创建后，再进行以下操作
-systemctl stop kubelet
-docker rm -f keepalived nginx-lb
-systemctl restart kubelet
+$ systemctl stop kubelet
+$ docker rm -f keepalived nginx-lb
+$ systemctl restart kubelet
 
 # 等待并检查pods状态，新增了keepalived和nginx-lb的pods
-kubectl get pods -n kube-system
+$ kubectl get pods -n kube-system
 NAME                                   READY   STATUS    RESTARTS   AGE
 coredns-54d67798b7-pqwl6               1/1     Running   0          10m
 coredns-54d67798b7-x7gvn               1/1     Running   0          10m
@@ -720,7 +726,7 @@ nginx-lb-k8s-master02                  1/1     Running   0          2m19s
 nginx-lb-k8s-master03                  1/1     Running   0          2m17s
 
 # 测试nginx-lb和keepalived
-curl -k https://k8s-vip:16443
+$ curl -k https://k8s-vip:16443
 {
   "kind": "Status",
   "apiVersion": "v1",
@@ -737,10 +743,10 @@ curl -k https://k8s-vip:16443
 }
 
 # 在所有master节点上修改/etc/kubernetes/admin.conf
-sed -i 's/:16443/:6443/g' /etc/kubernetes/admin.conf
+$ sed -i 's/:16443/:6443/g' /etc/kubernetes/admin.conf
 
-# 在所有node节点上执行join
-kubeadm join xxxx --token xxxx \
+# 在所有worker节点上执行join
+$ kubeadm join xxxx --token xxxx \
     --discovery-token-ca-cert-hash xxxx
 ```
 
@@ -748,11 +754,11 @@ kubeadm join xxxx --token xxxx \
 
 ```bash
 # 安装metrics-server
-cd kubeadm-ha
-kubectl apply -f addons/metrics-server.yaml
+$ cd kubeadm-ha
+$ kubectl apply -f addons/metrics-server.yaml
 
 # 等待一分钟左右后，查看pods的性能度量
-kubectl top pods -A
+$ kubectl top pods -A
 NAMESPACE         NAME                                      CPU(cores)   MEMORY(bytes)   
 calico-system     calico-kube-controllers-56689cf96-7kg7m   4m           11Mi            
 calico-system     calico-node-7rmx5                         61m          55Mi            
@@ -792,25 +798,27 @@ tigera-operator   tigera-operator-7c5d47c4b5-nmb8b          6m           22Mi
 
 ```bash
 # 安装kubernetes-dashboard
-cd kubeadm-ha
-cd addons
+$ cd kubeadm-ha
+$ cd addons
 
 # 设置kubernetes-dashboard证书
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt -subj "/CN=dashboard"
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout dashboard.key -out dashboard.csr -subj "/CN=dashboard"
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt -subj "/CN=dashboard"
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout dashboard.key -out dashboard.csr -subj "/CN=dashboard"
 # 注意设置vip的ip地址和主机名
-export VIPADDR=172.20.10.10
-export VIPHOST=k8s-vip
-echo "subjectAltName = DNS: dashboard, DNS: ${VIPHOST}, IP: ${VIPADDR}" > extfile.cnf
-openssl x509 -req -days 3650 -in dashboard.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extfile extfile.cnf -out dashboard.crt
+$ export VIPADDR=172.20.10.10
+$ export VIPHOST=k8s-vip
+$ echo "subjectAltName = DNS: dashboard, DNS: ${VIPHOST}, IP: ${VIPADDR}" > extfile.cnf
+$ openssl x509 -req -days 3650 -in dashboard.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extfile extfile.cnf -out dashboard.crt
 
-kubectl create namespace kubernetes-dashboard --dry-run=client -o yaml | kubectl apply -f -
-kubectl create secret generic kubernetes-dashboard-certs --from-file=dashboard.key --from-file=dashboard.crt -n kubernetes-dashboard --dry-run=client -o yaml | kubectl apply -f -
+# 创建kubernetes-dashboard证书
+$ kubectl create namespace kubernetes-dashboard --dry-run=client -o yaml | kubectl apply -f -
+$ kubectl create secret generic kubernetes-dashboard-certs --from-file=dashboard.key --from-file=dashboard.crt -n kubernetes-dashboard --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl apply -f kubernetes-dashboard.yaml
+# 安装kubernetes-dashboard
+$ kubectl apply -f kubernetes-dashboard.yaml
 
 # 检查kubernetes-dashboard安装情况
-kubectl -n kubernetes-dashboard get pods,services
+$ kubectl -n kubernetes-dashboard get pods,services
 NAME                                             READY   STATUS    RESTARTS   AGE
 pod/dashboard-metrics-scraper-79c5968bdc-xxf45   1/1     Running   0          22s
 pod/kubernetes-dashboard-7cb9fd9999-lqgw9        1/1     Running   0          22s
@@ -820,7 +828,7 @@ service/dashboard-metrics-scraper   ClusterIP   10.109.137.59    <none>        8
 service/kubernetes-dashboard        NodePort    10.108.252.248   <none>        443:30000/TCP   23s
 
 # 获取admin-user的token，用于登录kubernetes-dashboard
-kubectl -n kube-system get secrets $(kubectl -n kube-system get serviceaccounts admin-user -o=jsonpath='{.secrets[0].name}') -o=jsonpath='{.data.token}' | base64 -d
+$ kubectl -n kube-system get secrets $(kubectl -n kube-system get serviceaccounts admin-user -o=jsonpath='{.secrets[0].name}') -o=jsonpath='{.data.token}' | base64 -d
 ```
 
 - 使用token登录kubernetes-dashboard
@@ -839,7 +847,7 @@ kubernetes-dashboard访问URL: https://k8s-vip:30000
 
 ```bash
 # 查看所有pods的状态信息
-kubectl get pods -A -o wide
+$ kubectl get pods -A -o wide
 NAMESPACE              NAME                                         READY   STATUS    RESTARTS   AGE     IP                NODE           NOMINATED NODE   READINESS GATES
 calico-system          calico-kube-controllers-56689cf96-7kg7m      1/1     Running   0          43m     193.169.32.129    k8s-master01   <none>           <none>
 calico-system          calico-node-7rmx5                            1/1     Running   0          40m     172.20.10.6       k8s-master03   <none>           <none>
@@ -877,7 +885,7 @@ kubernetes-dashboard   kubernetes-dashboard-7cb9fd9999-lqgw9        1/1     Runn
 tigera-operator        tigera-operator-7c5d47c4b5-nmb8b             1/1     Running   1          43m     172.20.10.4       k8s-master01   <none>           <none>
 
 # 查看所有nodes的状态信息
-kubectl get nodes -o wide
+$ kubectl get nodes -o wide
 NAME           STATUS   ROLES                  AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION               CONTAINER-RUNTIME
 k8s-master01   Ready    control-plane,master   23m   v1.20.2   172.20.10.4   <none>        CentOS Linux 7 (Core)   5.11.0-1.el7.elrepo.x86_64   docker://20.10.3
 k8s-master02   Ready    control-plane,master   20m   v1.20.2   172.20.10.5   <none>        CentOS Linux 7 (Core)   5.11.0-1.el7.elrepo.x86_64   docker://20.10.3
