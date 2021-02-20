@@ -452,6 +452,7 @@ $ git clone https://github.com/cookeem/kubeadm-ha.git
 $ cd kubeadm-ha
 
 # execute on k8s-master01: install helm
+$ cd binary
 $ tar zxvf helm-v2.17.0-linux-amd64.tar.gz
 $ mv linux-amd64/helm /usr/bin/
 $ rm -rf linux-amd64
@@ -462,6 +463,7 @@ $ helm --help
 # Very important, please set the k8s-install-info.yaml file according to the actual situation
 # please read the comments in k8s-install-info.yaml carefully
 #######################
+$ cd kubeadm-ha
 $ vi k8s-install-info.yaml
 
 # execute on k8s-master01: use helm to create all install configuration files

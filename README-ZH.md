@@ -452,6 +452,7 @@ $ git clone https://github.com/cookeem/kubeadm-ha.git
 $ cd kubeadm-ha
 
 # 在k8s-master01上安装helm
+$ cd binary
 $ tar zxvf helm-v2.17.0-linux-amd64.tar.gz
 $ mv linux-amd64/helm /usr/bin/
 $ rm -rf linux-amd64
@@ -462,6 +463,7 @@ $ helm --help
 # 非常重要，请务必按照实际情况设置k8s-install-info.yaml文件
 # 详细说明参见k8s-install-info.yaml文件的备注
 #######################
+$ cd kubeadm-ha
 $ vi k8s-install-info.yaml
 
 # 在k8s-master01上使用helm生成安装配置文件
