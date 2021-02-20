@@ -449,6 +449,7 @@ $ docker pull kubernetesui/metrics-scraper:v1.0.6
 ```bash
 # 在k8s-master01上拉取kubeadm-ha
 $ git clone https://github.com/cookeem/kubeadm-ha.git
+$ cd kubeadm-ha
 
 # 在k8s-master01上安装helm
 $ tar zxvf helm-v2.17.0-linux-amd64.tar.gz
@@ -461,7 +462,6 @@ $ helm --help
 # 非常重要，请务必按照实际情况设置k8s-install-info.yaml文件
 # 详细说明参见k8s-install-info.yaml文件的备注
 #######################
-$ cd kubeadm-ha
 $ vi k8s-install-info.yaml
 
 # 在k8s-master01上使用helm生成安装配置文件
